@@ -67,13 +67,13 @@ getlnnum:
 
 
 ! int openrom (void)
-! Apre il file che simula la rom e calcola il numero di utenti.
+! Apre il file che simula la rom.
 ! Ritorna -1 se fallisce, 0 se tutto ok.
+! SIDE EFFECT:
+! - salva in romfd il valore del file descriptor del file della rom.
 openrom:
 	PUSH	BP
 	MOV	BP, SP
-
-	PUSH	BX
 
 	! Apertura del file rom.txt in lettura e scrittura.
 	PUSH	RDWR
@@ -86,20 +86,43 @@ openrom:
 	CMP	AX, -1
 	JE	9f
 
-	! Salvataggio file descriptor
+	! Altrimenti, salvataggio file descriptor.
 	MOV	(romfd), AX
+	MOV	AX, 0
 
-	! Calcolo numero di utenti.
-	PUSH	ROMEND
-	CALL	seekrom
-	ADD	SP, 2
+9:	MOV	SP, BP
+	POP	BP
+	RET
+
+
+! int loadrom (*buf, buflen)
+! Legge buflen byte dal file della rom salvandoli nel buffer buf. Tipicamente
+! buflen e' la dimensione massima possibile del file della rom.
+! Ritorna 0 se riesce, -1 se fallisce.
+! SIDE EFFECT:
+! - salva in numusers il numero di righe lette
+loadrom:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Lettura dal file.
+	PUSH	+6(BP)		! buflen
+	PUSH	+4(BP)		! buf
+	PUSH	(romfd)
+	PUSH	_READ
+	SYS
+	ADD	SP, 8
+
+	! Se _READ ritorna errore, salta alla fine.
+	CMP	AX, -1
+	JE	9f
+
+	! Calcolo e salvataggio del numero di utenti.
 	CALL	getlnnum
-
 	MOV	(numusers), AX
-	MOV	AX, 0		! valore di ritorno
+	MOV	AX, 0
 
-9:	POP	BX
-	MOV	SP, BP
+9:	MOV	SP, BP
 	POP	BP
 	RET
 
@@ -243,15 +266,14 @@ romfmt:
 romfd:
 	.SPACE	2
 romimg:
-	.SPACE	2600		! ROMLINELEN * 100
-
+	.SPACE	MAXROMLEN
 numusers:
 	.SPACE	2
 
 ! Buffer usato da prsromln.
 romlnbuf:
 	.SPACE	ROMLINELEN
-! Buffer usati da srchrom
+! Buffer temporanei per utente e password.
 tmpusrn:
 	.SPACE	MAXUSRLEN+1
 tmppass:

@@ -10,10 +10,15 @@ main:
 	! FIXME commentare se non ci sono test da fare
 	!CALL dotest
 
-	! Inizializzazione file di rom
+	! Inizializzazione file di rom.
 	CALL	openrom
 	CMP	AX, -1
 	JE	9f
+
+	! Caricamento rom.
+	PUSH	MAXROMLEN
+	PUSH	romimg
+	CALL	loadrom
 
 	! Da specifiche, "all'avvio file di log creato vuoto"
 	PUSH	0644
