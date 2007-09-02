@@ -15,10 +15,13 @@ main:
 	CMP	AX, -1
 	JE	9f
 
-	! Caricamento rom.
+	! Caricamento file di rom in memoria e calcolo numero di utenti.
 	PUSH	MAXROMLEN
 	PUSH	romimg
 	CALL	loadrom
+	ADD	SP, 4
+	CMP	AX, -1
+	JE	9f
 
 	! Da specifiche, "all'avvio file di log creato vuoto"
 	PUSH	0644

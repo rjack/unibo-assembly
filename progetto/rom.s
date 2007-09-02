@@ -94,13 +94,32 @@ openrom:
 	POP	BP
 	RET
 
+! int getromsz (void)
+! Ritorna il numero di byte usati in romimg, basandosi sul numero di utenti e
+! sulla lunghezza di una riga della rom.
+getromsz:
+	PUSH	BP
+	MOV	BP, SP
+
+	PUSH	BX
+
+	MOV	AX, (numusers)
+	MOV	BX, ROMLINELEN
+	MUL	BX
+
+	POP	BX
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
 
 ! int loadrom (*buf, buflen)
 ! Legge buflen byte dal file della rom salvandoli nel buffer buf. Tipicamente
 ! buflen e' la dimensione massima possibile del file della rom.
 ! Ritorna 0 se riesce, -1 se fallisce.
 ! SIDE EFFECT:
-! - salva in numusers il numero di righe lette
+! - salva in numusers il numero di righe lette.
 loadrom:
 	PUSH	BP
 	MOV	BP, SP
@@ -120,6 +139,55 @@ loadrom:
 	! Calcolo e salvataggio del numero di utenti.
 	CALL	getlnnum
 	MOV	(numusers), AX
+	MOV	AX, 0
+
+9:	MOV	SP, BP
+	POP	BP
+	RET
+
+
+! int saverom (*buf, buflen)
+! Ricrea il file della rom scrivendoci i primi buflen byte del buffer buf.
+! Tipicamente buf punta all'immagine in memoria della rom e buflen e' la sua
+! dimensione.
+! Ritorna 0 se riesce, -1 se fallisce.
+! SIDE EFFECT:
+! - chiude e riapre romfd.
+saverom:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Chiusura file descriptor della rom.
+	PUSH	(romfd)
+	PUSH	_CLOSE
+	SYS
+	ADD	SP, 4
+	CMP	AX, -1
+	JE	9f
+
+	! Riapertura di un file vuoto.
+	PUSH	0644
+	PUSH	rompath
+	PUSH	_CREAT
+	SYS
+	ADD	SP, 6
+	CMP	AX, -1
+	JE	9f
+
+	! Salvataggio nuovo file descriptor.
+	MOV	(romfd), AX
+
+	! Scrittura buffer nel nuovo file.
+	PUSH	+6(BP)
+	PUSH	+4(BP)
+	PUSH	(romfd)
+	PUSH	_WRITE
+	SYS
+	ADD	SP, 8
+	CMP	AX, -1
+	JE	9f
+
+	! Riuscito, ritorna 0.
 	MOV	AX, 0
 
 9:	MOV	SP, BP
