@@ -1,0 +1,126 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.6	//
+BADGESIM	io.s	/^	BADGESIM = 'x'$/;"	d
+CNLCHAR	kbrd.s	/^	CNLCHAR = ','$/;"	d
+DEC	kbrd.s	/^	DEC	DI$/;"	d
+IN_2	io.s	/^IN_2:$/;"	l
+KBDSTRLN	kbrd.s	/^	KBDSTRLN = 20$/;"	d
+LINELEN	drwscr.s	/^	LINELEN = 29		! 28 spazi piu' terminatore$/;"	d
+OUT_2	io.s	/^OUT_2:$/;"	l
+POP	drwscr.s	/^	POP	DX$/;"	d
+POP	file.s	/^	POP	DI$/;"	d
+POP	kbrd.s	/^	POP	DI$/;"	d
+POP	string.s	/^	POP	DI$/;"	d
+PUSH	drwscr.s	/^	PUSH	DX$/;"	d
+PUSH	file.s	/^	PUSH	DI$/;"	d
+PUSH	io.s	/^	PUSH	DI		! salvataggio$/;"	d
+PUSH	io.s	/^	PUSH	DI$/;"	d
+PUSH	io.s	/^	PUSH	DX$/;"	d
+PUSH	kbrd.s	/^	PUSH	DI$/;"	d
+PUSH	string.s	/^	PUSH	DI$/;"	d
+RETCHAR	kbrd.s	/^	RETCHAR = '.'$/;"	d
+TMPBUFLEN	file.s	/^	TMPBUFLEN  = 10$/;"	d
+admmenu	menu.s	/^admmenu:$/;"	l
+admroute	menu.s	/^admroute:$/;"	l
+anykey	adm.s	/^anykey:$/;"	l
+badgefd	io.s	/^badgefd:$/;"	l
+bdgpath	io.s	/^bdgpath:$/;"	l
+bldindx	file.s	/^bldindx:$/;"	l
+blkline	drwscr.s	/^blkline:$/;"	l
+cantadd	adm.s	/^cantadd:$/;"	l
+chgpass	usr.s	/^chgpass:$/;"	l
+choiche	menu.s	/^choiche:$/;"	l
+crapbuf	io.s	/^crapbuf:$/;"	l
+dotest	aaboot.s	/^dotest:$/;"	l
+drwmsg	drwscr.s	/^drwmsg:$/;"	l
+drwscr	drwscr.s	/^drwscr:$/;"	l
+editrom	rom.s	/^editrom:$/;"	l
+errbadge	io.s	/^errbadge:$/;"	l
+errchc	kbrd.s	/^errchc:$/;"	l
+errfull	adm.s	/^errfull:$/;"	l
+errhw	io.s	/^errhw:$/;"	l
+errlenps	usr.s	/^errlenps:$/;"	l
+errpass	io.s	/^errpass:$/;"	l
+errpslen	adm.s	/^errpslen:$/;"	l
+erruser	io.s	/^erruser:$/;"	l
+errusexs	adm.s	/^errusexs:$/;"	l
+erruslen	adm.s	/^erruslen:$/;"	l
+flush	drwscr.s	/^flush:$/;"	l
+fmtline	drwscr.s	/^fmtline:$/;"	l
+getlnnum	rom.s	/^getlnnum:$/;"	l
+insert	drwscr.s	/^insert:$/;"	l
+kbdpass	io.s	/^kbdpass:$/;"	l
+kbdstr	kbrd.s	/^kbdstr:$/;"	l
+keybrd	drwscr.s	/^keybrd:$/;"	l
+keypress	kbrd.s	/^keypress:$/;"	l
+lettore	io.s	/^lettore:$/;"	l
+line	drwscr.s	/^line:$/;"	l
+logfd	aaboot.s	/^logfd:$/;"	l
+logpath	aaboot.s	/^logpath:$/;"	l
+main	aaboot.s	/^main:$/;"	l
+mecancl	menu.s	/^mecancl:$/;"	l
+medoor	menu.s	/^medoor:$/;"	l
+memcmp	string.s	/^memcmp:$/;"	l
+memcpy	string.s	/^memcpy:$/;"	l
+mepass	menu.s	/^mepass:$/;"	l
+meusadd	adm.s	/^meusadd:$/;"	l
+meuslst	adm.s	/^meuslst:$/;"	l
+meusmng	menu.s	/^meusmng:$/;"	l
+meussrch	adm.s	/^meussrch:$/;"	l
+msginbdg	aaboot.s	/^msginbdg:$/;"	l
+msginnew	usr.s	/^msginnew:$/;"	l
+msginpas	aaboot.s	/^msginpas:$/;"	l
+msginusr	adm.s	/^msginusr:$/;"	l
+msgnewps	usr.s	/^msgnewps:$/;"	l
+msgnewus	adm.s	/^msgnewus:$/;"	l
+msgtitle	aaboot.s	/^msgtitle:$/;"	l
+mtadm	menu.s	/^mtadm:$/;"	l
+mtumng	adm.s	/^mtumng:$/;"	l
+mtuser	menu.s	/^mtuser:$/;"	l
+newkey	adm.s	/^newkey:$/;"	l
+newpass	adm.s	/^newpass:$/;"	l
+newusrn	adm.s	/^newusrn:$/;"	l
+noop	menu.s	/^noop:$/;"	l
+numfmt	kbrd.s	/^numfmt:$/;"	l
+numusers	rom.s	/^numusers:$/;"	l
+opendoor	usr.s	/^opendoor:$/;"	l
+openrom	rom.s	/^openrom:$/;"	l
+prsromln	rom.s	/^prsromln:$/;"	l
+rdpass	io.s	/^rdpass:$/;"	l
+rduser	io.s	/^rduser:$/;"	l
+readchc	kbrd.s	/^readchc:$/;"	l
+readkbd	kbrd.s	/^readkbd:$/;"	l
+rele	io.s	/^rele:$/;"	l
+romfd	rom.s	/^romfd:$/;"	l
+romfmt	rom.s	/^romfmt:$/;"	l
+romimg	rom.s	/^romimg:$/;"	l
+romlnbuf	rom.s	/^romlnbuf:$/;"	l
+rompath	rom.s	/^rompath:$/;"	l
+seekrom	rom.s	/^seekrom:$/;"	l
+serveadm	adm.s	/^serveadm:$/;"	l
+serveusr	usr.s	/^serveusr:$/;"	l
+shwmenu	menu.s	/^shwmenu:$/;"	l
+skipln	kbrd.s	/^skipln:$/;"	l
+srchrom	rom.s	/^srchrom:$/;"	l
+strcmp	string.s	/^strcmp:$/;"	l
+strcpy	string.s	/^strcpy:$/;"	l
+strlen	string.s	/^strlen:$/;"	l
+title	drwscr.s	/^title:$/;"	l
+tmpbuf	file.s	/^tmpbuf:$/;"	l
+tmppass	rom.s	/^tmppass:$/;"	l
+tmpusrn	rom.s	/^tmpusrn:$/;"	l
+ummenu	adm.s	/^ummenu:$/;"	l
+umroute	adm.s	/^umroute:$/;"	l
+updwbrd	drwscr.s	/^updwbrd:$/;"	l
+usadd	adm.s	/^usadd:$/;"	l
+userid	io.s	/^userid:$/;"	l
+username	io.s	/^username:$/;"	l
+uslst	adm.s	/^uslst:$/;"	l
+usrmenu	menu.s	/^usrmenu:$/;"	l
+usrmng	adm.s	/^usrmng:$/;"	l
+usrroute	menu.s	/^usrroute:$/;"	l
+ussrch	adm.s	/^ussrch:$/;"	l
