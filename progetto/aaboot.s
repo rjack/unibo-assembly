@@ -16,10 +16,7 @@ main:
 	JE	9f
 
 	! Caricamento file di rom in memoria e calcolo numero di utenti.
-	PUSH	MAXROMLEN
-	PUSH	romimg
 	CALL	loadrom
-	ADD	SP, 4
 	CMP	AX, -1
 	JE	9f
 

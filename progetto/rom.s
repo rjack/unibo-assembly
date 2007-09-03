@@ -66,6 +66,20 @@ getlnnum:
 	RET
 
 
+! int getlnoff (id)
+! Ritorna l'offset della riga id rispetto all'inizio della rom.
+getlnoff:
+	PUSH	BP
+	MOV	BP, SP
+
+	MOV	AX, ROMLINELEN
+	MUL	+4(BP)		! id
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
 ! int openrom (void)
 ! Apre il file che simula la rom.
 ! Ritorna -1 se fallisce, 0 se tutto ok.
@@ -114,9 +128,9 @@ getromsz:
 	RET
 
 
-! int loadrom (*buf, buflen)
-! Legge buflen byte dal file della rom salvandoli nel buffer buf. Tipicamente
-! buflen e' la dimensione massima possibile del file della rom.
+! int loadrom (void)
+! Legge tutta la rom e ne salva l'immagine in memoria. Calcola il numero di
+! utenti presenti contando le righe del file.
 ! Ritorna 0 se riesce, -1 se fallisce.
 ! SIDE EFFECT:
 ! - salva in numusers il numero di righe lette.
@@ -125,8 +139,8 @@ loadrom:
 	MOV	BP, SP
 
 	! Lettura dal file.
-	PUSH	+6(BP)		! buflen
-	PUSH	+4(BP)		! buf
+	PUSH	MAXROMLEN
+	PUSH	romimg
 	PUSH	(romfd)
 	PUSH	_READ
 	SYS
@@ -146,10 +160,9 @@ loadrom:
 	RET
 
 
-! int saverom (*buf, buflen)
-! Ricrea il file della rom scrivendoci i primi buflen byte del buffer buf.
-! Tipicamente buf punta all'immagine in memoria della rom e buflen e' la sua
-! dimensione.
+! int saverom (void)
+! Ricrea il file della rom salvando interamente l'immagine della rom in
+! memoria.
 ! Ritorna 0 se riesce, -1 se fallisce.
 ! SIDE EFFECT:
 ! - chiude e riapre romfd.
@@ -177,9 +190,12 @@ saverom:
 	! Salvataggio nuovo file descriptor.
 	MOV	(romfd), AX
 
+	! Calcolo dimensioni effettive romimg.
+	CALL	getromsz
+
 	! Scrittura buffer nel nuovo file.
-	PUSH	+6(BP)
-	PUSH	+4(BP)
+	PUSH	AX		! dimensione rom
+	PUSH	romimg
 	PUSH	(romfd)
 	PUSH	_WRITE
 	SYS
@@ -280,45 +296,30 @@ srchrom:
 	RET
 
 
-! void editrom (id, newuser, newpass)
-! Sovrascrive la riga associata a id con il nuovo username e la nuova
-! password.
-editrom:
+! void editpass (id, *newpass)
+! Sovrascrive la password della riga id e salva la rom.
+editpass:
 	PUSH	BP
 	MOV	BP, SP
 
-	! Calcola offset riga.
-	MOV	AX, ROMLINELEN
-	MUL	+4(BP)		! id
-	ADD	AX, KEYLEN	! salta la chiave numerica
+	! Calcolo offset riga.
+	PUSH	+4(BP)		! id
+	CALL	getlnoff
+	ADD	SP, 2
 
-	! Salta al primo carattere dell'username.
-	PUSH	SEEK_SET
-	PUSH	0
-	PUSH	AX
-	PUSH	(romfd)
-	PUSH	_LSEEK
-	SYS
-	ADD	SP, 10
+	! Costruzione puntatore al primo carattere della password.
+	ADD	AX, MAXUSRLEN
+	ADD	AX, romimg
+	
+	! Copia della nuova password in romimg.
+	PUSH	PASSLEN
+	PUSH	+6(BP)		! newpass
+	PUSH	AX		! romimg + offset
+	CALL	memcpy
+	ADD	SP, 6
 
-	PUSH	0		! spazio per len
-	PUSH	+6(BP)		! newuser
-	CALL	strlen
-	MOV	-2(BP), AX	! salvataggio len
-	PUSH	(romfd)
-	PUSH	_WRITE
-	SYS
-
-	NEG	-2(BP)
-	ADD	-2(BP), MAXUSRLEN
-	INC	-2(BP)
-	MOV	-4(BP), blkline
-	SYS
-
-	MOV	-2(BP), PASSLEN
-	MOV	AX, +8(BP)
-	MOV	-4(BP), AX
-	SYS
+	! Salvataggio romimg in rom.txt
+	CALL	saverom
 
 	MOV	SP, BP
 	POP	BP
