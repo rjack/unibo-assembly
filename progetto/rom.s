@@ -325,7 +325,8 @@ romusadd:
 	CALL	strcpy
 	ADD	SP, 4
 
-	! Puntatore posizionato all'inizio del campo password e copia di newpass.
+	! Puntatore posizionato all'inizio del campo password e copia di
+	! newpass.
 	ADD	BX, MAXUSRLEN+1
 	PUSH	PASSLEN
 	PUSH	+6(BP)
@@ -333,8 +334,54 @@ romusadd:
 	CALL	memcpy
 	ADD	SP, 6
 
-	! Incremento numero utenti e salvataggio rom.txt.
+	! Incremento numero di utenti e salvataggio rom.txt.
 	INC	(numusers)
+	CALL	saverom
+
+	POP	BX
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
+! int romusdel (id)
+! Rimuove la riga numero id da romimg, salva rom.txt e decrementa il numero di
+! utenti.
+romusdel:
+	PUSH	BP
+	MOV	BP, SP
+
+	PUSH	BX
+
+	! Calcolo offset riga successiva a quella da rimuovere.
+	PUSH	+4(BP)		! id
+	CALL	getlnoff
+	ADD	SP, 2
+	MOV	BX, AX
+	ADD	BX, ROMLINELEN
+
+	! Calcolo dimensione dati da spostare.
+	CALL	getromsz
+	SUB	AX, BX
+
+	! Se non ci sono dati da spostare id e' l'ultima riga e si salta la
+	! copia.
+	CMP	AX, 0
+	JE	8f
+
+	! Copia delle righe successive alla numero id sulla numero id.
+	! Le aree di memoria si sovrappongono ma la copia e' possibile perche'
+	! avviene dagli indirizzi piu' alti a quelli piu' bassi.
+	PUSH	AX		! dimensione
+	PUSH	BX		! riga successiva a quella da rimuovere
+	SUB	BX, ROMLINELEN
+	PUSH	BX		! riga da rimuovere
+	CALL	memcpy
+	ADD	SP, 6
+
+	! Decremento numero di utenti e salvataggio rom.txt.
+8:	DEC	(numusers)
 	CALL	saverom
 
 	POP	BX
