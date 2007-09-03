@@ -296,6 +296,54 @@ srchrom:
 	RET
 
 
+! int romusadd (*newuser, *newpass)
+! Aggiunge un nuovo utente a romimg e salva rom.txt
+! Ritorna 0 se riesce, -1 se fallisce.
+! SIDE EFFECT: incrementa numusers.
+romusadd:
+	PUSH	BP
+	MOV	BP, SP
+
+	PUSH	BX
+
+	! Calcolo dimensione romimg.
+	CALL	getromsz
+	MOV	BX, AX
+
+	! Puntatore posizionato alla fine di romimg.
+	ADD	BX, romimg
+
+	! Copia riga vuota (compreso \n finale) alla fine della rom.
+	PUSH	romln
+	PUSH	BX
+	CALL	strcpy
+	ADD	SP, 4
+
+	! Copia del nome utente all'inizio della riga.
+	PUSH	+4(BP)		! newuser
+	PUSH	BX		! romimg + offset
+	CALL	strcpy
+	ADD	SP, 4
+
+	! Puntatore posizionato all'inizio del campo password e copia di newpass.
+	ADD	BX, MAXUSRLEN+1
+	PUSH	PASSLEN
+	PUSH	+6(BP)
+	PUSH	BX
+	CALL	memcpy
+	ADD	SP, 6
+
+	! Incremento numero utenti e salvataggio rom.txt.
+	INC	(numusers)
+	CALL	saverom
+
+	POP	BX
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
 ! void editpass (id, *newpass)
 ! Sovrascrive la password della riga id e salva la rom.
 editpass:
@@ -336,6 +384,8 @@ romfd:
 	.SPACE	2
 romimg:
 	.SPACE	MAXROMLEN
+romln:
+	.ASCIZ	"                         \n"
 numusers:
 	.SPACE	2
 

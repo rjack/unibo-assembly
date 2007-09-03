@@ -76,10 +76,9 @@ chgpass:
 2:	ADD	SP, 4
 
 	PUSH	tmppass
-	PUSH	username
 	PUSH	(userid)
-	CALL	editrom
-	ADD	SP, 6
+	CALL	editpass
+	ADD	SP, 4
 
 	MOV	SP, BP
 	POP	BP

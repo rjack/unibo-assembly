@@ -52,6 +52,8 @@ usrmng:
 
 
 usadd:
+	! FIXME
+	! Questo codice va adattato al nuovo formato della rom.
 	PUSH	BP
 	MOV	BP, SP
 
@@ -103,9 +105,8 @@ usadd:
 
 	PUSH	newpass
 	PUSH	newusrn
-	PUSH	(newkey)
-	CALL	editrom
-	ADD	SP, 6
+	CALL	romusadd
+	ADD	SP, 4
 	JMP	9f
 
 	! Lunghezza username non valida, salta all'inizio.
