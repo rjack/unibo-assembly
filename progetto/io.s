@@ -137,12 +137,12 @@ OUT_2:
 	RET
 
 
-! int rduser (void)
+! int rdbadge (void)
 ! Accede al lettore del badge, attende l'inserimento e prova a leggere il nome
 ! utente, salvandolo nella variabile username.
 ! Ritorna 0 se tutto ok, -1 se fallisce. In questo caso mostra un messaggio di
 ! errore.
-rduser:
+rdbadge:
 	PUSH	BP
 	MOV	BP, SP
 

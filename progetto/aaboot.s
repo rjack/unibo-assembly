@@ -41,7 +41,7 @@ main:
 	ADD	SP, 12
 	
 1:	! Lettura nome utente.
-	CALL	rduser
+	CALL	rdbadge
 	CMP	AX, -1		! badge male inserito
 	JE	1b
 

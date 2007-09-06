@@ -54,6 +54,8 @@ usrmng:
 usadd:
 	! FIXME
 	! Questo codice va adattato al nuovo formato della rom.
+	! FIXME
+	! Questo codice deve usare le funzioni rduser e rdpass.
 	PUSH	BP
 	MOV	BP, SP
 
