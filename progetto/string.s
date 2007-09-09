@@ -9,6 +9,30 @@
 
 
 .SECT .TEXT
+
+! void memset (*buf, ch, buflen)
+! Inizializza tutti i buflen byte di buf al carattere ch.
+memset:
+	PUSH	BP
+	MOV	BP, SP
+
+	PUSH	CX
+	PUSH	DI
+
+	MOV	CX, +8(BP)	! buflen
+	MOVB	AL, +6(BP)	! ch
+	MOV	DI, +4(BP)	! buf
+
+	REP	STOSB
+
+	POP	DI
+	POP	CX
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
 ! void memcpy (dst, src, n)
 ! Copia i primi n byte del buffer puntato da src nel buffer puntato da dst, che
 ! deve essere grande a sufficienza.

@@ -38,9 +38,9 @@ IN_2:
 	PUSH	_GETCHAR
 	SYS
 	ADD	SP, 2
-	PUSH	AX			! salvataggio
-	CALL	skipln
-	POP	AX			! ripristino
+	PUSH	AX			! salvataggio primo carattere
+	CALL	skipln			! scarta tutto il resto fino al \n
+	POP	AX			! ripristino primo carattere
 
 	CMPB	AL, BADGESIM		! AL == 'x'
 	JNE	8f
@@ -56,9 +56,9 @@ IN_2:
 
 	MOV	(badgefd), AX		! salvataggio fd
 
-	! Lettura di un carattere dal badge. Generalmente i file terminano con
-	! un '\n' finale, ma non e' certo. Viene controllato prima l'EOF poi
-	! il '\n'.
+	! Lettura di un carattere dal badge. Generalmente i file hanno un \n
+	! prima dell'EOF, ma non e' certo. Viene controllato prima l'EOF poi
+	! il \n.
 1:	PUSH	1
 	PUSH	lettore	
 	PUSH	(badgefd)
@@ -142,6 +142,8 @@ OUT_2:
 ! utente, salvandolo nella variabile username.
 ! Ritorna 0 se tutto ok, -1 se fallisce. In questo caso mostra un messaggio di
 ! errore.
+! SIDE EFFECT:
+! - salva il nome utente in username
 rdbadge:
 	PUSH	BP
 	MOV	BP, SP
@@ -161,17 +163,20 @@ rdbadge:
 	JG	1b
 
 	! Ricerca utente nel database
+	! FIXME: da adattare al nuovo formato della rom.
 	PUSH	username
 	CALL	srchrom
 	ADD	SP, 2
 	CMP	AX, -1
 	JE	8f
 
-	MOV	(userid), AX	! Salvataggio userid
+	! L'utente esiste, salva userid e ritorna zero.
+	MOV	(userid), AX
 	MOV	AX, 0
 	JMP	9f
 
-	! Costruzione messaggio d'errore.
+	! Stampa del messaggio d'errore. DX viene riempito da IN_2 e contiente
+	! il puntatore al messaggio.
 8:	PUSH	4
 	PUSH	DX
 	CALL	drwmsg
@@ -196,7 +201,7 @@ rdpass:
 	MOV	BP, SP
 
 	PUSH	PASSLEN+1
-	PUSH	kbdpass
+	PUSH	password
 	CALL	readkbd
 	PUSH	tmppass
 	CALL	memcmp
@@ -204,15 +209,8 @@ rdpass:
 	CMP	AX, 0
 	JE	9f
 
-	PUSH	NULL
-	PUSH	msginbdg
-	PUSH	errpass
-	PUSH	NULL
-	PUSH	msgtitle
-	PUSH	NULL
-	CALL	drwscr
-	ADD	SP, 12
-	MOV	AX, -1
+	! FIXME
+	! Deve stampare l'errore errpass.
 
 9:	MOV	SP, BP
 	POP	BP
@@ -234,15 +232,9 @@ badgefd:
 	.WORD	-1
 
 .SECT .BSS
-username:
-	.SPACE	17
 userid:
 	.SPACE	2
 lettore:
 	.SPACE	1		! simula indirizzo mappato e buffer controller
 rele:
 	.SPACE	1		! simula indirizzo mappato
-kbdpass:
-	.SPACE	PASSLEN+1	! password digitata
-crapbuf:
-	.SPACE	10

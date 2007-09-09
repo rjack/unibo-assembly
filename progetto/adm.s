@@ -19,16 +19,6 @@ serveadm:
 	JE	1b
 	ADD	SP, 6
 
-	! Stampa messaggio iniziale.
-	PUSH	NULL
-	PUSH	msginbdg
-	PUSH	NULL
-	PUSH	NULL
-	PUSH	msgtitle
-	PUSH	NULL
-	CALL	drwscr
-	ADD	SP, 12
-
 	MOV	SP, BP
 	POP	BP
 	RET
@@ -56,6 +46,8 @@ usadd:
 	! Questo codice va adattato al nuovo formato della rom.
 	! FIXME
 	! Questo codice deve usare le funzioni rduser e rdpass.
+	! FIXME
+	! Questo codice deve gestire
 	PUSH	BP
 	MOV	BP, SP
 
@@ -66,6 +58,8 @@ usadd:
 	! JE	8f
 	! MOV	(newkey), AX
 
+	! FIXME
+	! Sostituire con askuser
 	PUSH	NULL
 	PUSH	msginusr	! inserire nome utente
 	PUSH	NULL
@@ -75,6 +69,8 @@ usadd:
 	CALL	drwscr
 	ADD	SP, 12
 
+	! FIXME
+	! Sostituire con askuser
 	! Lettura nuovo nome utente
 1:	PUSH	MAXUSRLEN+1
 	PUSH	newusrn
@@ -92,11 +88,15 @@ usadd:
 	CMP	AX, -1
 	JNE	5f
 
+	! FIXME
+	! Sostituire con askpass
 	PUSH	5
 	PUSH	msginpas		! digitare password
 	CALL	drwmsg
 	ADD	SP, 4
 
+	! FIXME
+	! Sostituire con askpass
 	! Lettura password
 2:	PUSH	PASSLEN+1
 	PUSH	newpass

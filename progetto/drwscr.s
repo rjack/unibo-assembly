@@ -141,9 +141,38 @@ drwmsg:
 	POP	BP
 	RET
 
+! void askbadge (*title, *userbuf)
+! Stampa una schermata con titolo title e con la richiesta di inserimento del
+! badge. Attende la pressione del tasto associato all'evento e usa rdbadge per
+! riempire il buffer userbuf, che deve essere grande almeno MAXUSRLEN.
+! In caso di errore ripresenta la domanda: non ritorna finche' il badge non
+! e' stato letto correttamente.
+askbadge:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Stampa schermo iniziale.
+	PUSH	NULL
+	PUSH	insert		! "inserire il badge"
+	PUSH	NULL
+	PUSH	NULL
+	PUSH	+4(BP)		! title
+	PUSH	NULL
+	CALL	drwscr
+	ADD	SP, 12
+
+	! Lettura nome utente.
+1:	CALL	rdbadge
+	CMP	AX, -1		! badge male inserito
+	! In caso di errore la stampa di un messaggio esplicativo e' a carico
+	! di rdbadge quindi e' sufficiente ritentare.
+	JE	1b
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
 .SECT .DATA
-title:
-	.ASCIZ	"CONTROLLO ACCESSI"
 insert:
 	.ASCIZ	"inserire il badge..."
 updwbrd:

@@ -16,16 +16,6 @@ serveusr:
 	JE	1b
 	ADD	SP, 6
 
-	! Stampa messaggio iniziale.
-	PUSH	NULL
-	PUSH	msginbdg
-	PUSH	NULL
-	PUSH	NULL
-	PUSH	msgtitle
-	PUSH	NULL
-	CALL	drwscr
-	ADD	SP, 12
-
 	MOV	SP, BP
 	POP	BP
 	RET

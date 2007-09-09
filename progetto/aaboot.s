@@ -30,20 +30,14 @@ main:
 	JE	9f
 	MOV	(logfd), AX
 
-	! Stampa schermo iniziale.
-	PUSH	NULL
-	PUSH	msginbdg	! inserire badge
-	PUSH	NULL
-	PUSH	NULL
-	PUSH	msgtitle	! CONTROLLO ACCESSI
-	PUSH	NULL
-	CALL	drwscr
-	ADD	SP, 12
+1:	! Inizializzazione buffer di tutto il sistema.
+	! Eseguita prima di ogni inserimento del badge.
+	CALL	initbufs
 	
-1:	! Lettura nome utente.
-	CALL	rdbadge
-	CMP	AX, -1		! badge male inserito
-	JE	1b
+	! Richiesta badge.
+	PUSH	msgtitle
+	CALL	askbadge
+	ADD	SP, 2
 
 	! Stampa richiesta password.
 	PUSH	NULL
@@ -75,6 +69,33 @@ main:
 	PUSH	_EXIT
 	SYS
 
+
+! void initbufs (void)
+! Inizializza i buffer del sistema.
+initbufs:
+	CALL	clruser		! riempe di spazi username
+	CALL	clrpass		! idem con password
+	RET
+
+
+clruser:
+	PUSH	MAXUSRLEN
+	PUSH	'\0'
+	PUSH	username
+	CALL	memset
+	ADD	SP, 6
+	RET
+
+
+clrpass:
+	PUSH	PASSLEN
+	PUSH	'\0'
+	PUSH	password
+	CALL	memset
+	ADD	SP, 6
+	RET
+
+
 ! Routine per testare le altre routine
 dotest:
 	PUSH	BP
@@ -89,11 +110,16 @@ logpath:
 	.ASCIZ	"porta.log"
 msgtitle:
 	.ASCIZ	"CONTROLLO ACCESSI"
-msginbdg:
-	.ASCIZ	"inserire badge..."
 msginpas:
 	.ASCIZ	"digitare password..."
 
 .SECT .BSS
 logfd:
 	.SPACE	2
+
+! Variabili usate nell'autenticazione dell'utente.
+! username ha il terminatore, password no perche' e' di lunghezza fissa.
+username:
+	.SPACE	MAXUSRLEN
+password:
+	.SPACE	PASSLEN

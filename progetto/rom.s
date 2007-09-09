@@ -79,6 +79,37 @@ getlnoff:
 	POP	BP
 	RET
 
+! int creatrom (void)
+! Crea il file della rom, con un unico utente amministratore.
+! Chiamata SOLO quando openrom non riesce ad aprire la rom.
+! Ritorna il file descriptor del file creato, oppure -1 se fallisce.
+creatrom:
+	PUSH	BP
+	MOV	BP, SP
+
+	PUSH	0644
+	PUSH	rompath
+	PUSH	_CREAT
+	SYS
+	ADD	SP, 6
+
+	CMP	AX, -1
+	JE	9f
+
+	! Inserimento admin.
+	PUSH	ROMLINELEN
+	PUSH	romdflt
+	PUSH	AX		! fd, ancora da ritornare
+	PUSH	_WRITE
+	SYS
+	ADD	SP, 2
+	POP	AX		! ritorna fd
+	ADD	SP, 4
+
+9:	MOV	SP, BP
+	PUSH	BP
+	RET
+
 
 ! int openrom (void)
 ! Apre il file che simula la rom.
@@ -96,12 +127,18 @@ openrom:
 	SYS
 	ADD	SP, 6
 
-	! Se la open e' fallita, ritorna subito -1.
+	! Se la open e' fallita, creazione rom minimale con unico utente
+	! admin.
+	CMP	AX, -1
+	JNE	8f
+
+	! Se fallisce anche la creatrom, ritorna subito.
+	CALL	creatrom
 	CMP	AX, -1
 	JE	9f
 
-	! Altrimenti, salvataggio file descriptor.
-	MOV	(romfd), AX
+	! Altrimenti, salva file descriptor e ritorna 0.
+8:	MOV	(romfd), AX
 	MOV	AX, 0
 
 9:	MOV	SP, BP
@@ -138,7 +175,7 @@ loadrom:
 	PUSH	BP
 	MOV	BP, SP
 
-	! Lettura dal file.
+	! Lettura di tutto il file.
 	PUSH	MAXROMLEN
 	PUSH	romimg
 	PUSH	(romfd)
@@ -425,14 +462,15 @@ editpass:
 rompath:
 	.ASCIZ	"./rom.txt"
 romfmt:
-	.ASCIZ	"%s %s\n"
+	.ASCIZ	"%s\0%s"
+romdflt:
+	.ASCIZ	"admin\0\0\0\0\0\0\0\0\0\0\0\000000000"
+
 .SECT .BSS
 romfd:
 	.SPACE	2
 romimg:
 	.SPACE	MAXROMLEN
-romln:
-	.ASCIZ	"                         \n"
 numusers:
 	.SPACE	2
 
@@ -441,6 +479,6 @@ romlnbuf:
 	.SPACE	ROMLINELEN
 ! Buffer temporanei per utente e password.
 tmpusrn:
-	.SPACE	MAXUSRLEN+1
+	.SPACE	MAXUSRLEN
 tmppass:
-	.SPACE	PASSLEN+1
+	.SPACE	PASSLEN
