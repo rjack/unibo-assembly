@@ -5,6 +5,39 @@
 
 .SECT .TEXT
 
+! int authusr (id, *pass)
+! Confronta la password passata come argomento con quella salvata nel record
+! id della rom.
+! Ritorna 0 se le password coincidono, -1 altrimenti.
+authusr:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Costruzione puntatore alla password salvata nella romimg.
+	PUSH	+4(BP)		! id
+	CALL	getlnoff
+	ADD	SP, 2
+	ADD	AX, MAXUSRLEN+1
+	ADD	AX, romimg
+
+	! Confronto con la password passata come argomento.
+	PUSH	PASSLEN
+	PUSH	AX		! campo pass del record #id
+	PUSH	+6(BP)		! pass
+	CALL	memcmp
+	ADD	SP, 8
+
+	! Pass coincidono, ritorna 0.
+	CMP	AX, 0
+	JE	9f
+	! Altrimenti ritorna -1.
+	MOV	AX, -1
+
+9:	MOV	SP, BP
+	POP	BP
+	RET
+
+
 ! int srchrom (*name)
 ! Cerca user tra i campi utente dei record della romimg.
 ! Se user esiste ritorna il suo id, altrimenti ritorna -1.

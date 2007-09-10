@@ -92,7 +92,7 @@ usadd:
 	! FIXME
 	! Sostituire con askpass
 	PUSH	5
-	PUSH	msginpas		! digitare password
+	! PUSH	msginpas		! digitare password
 	CALL	drwmsg
 	ADD	SP, 4
 

@@ -35,21 +35,19 @@ main:
 	CALL	askbadge
 	ADD	SP, 2
 
-	! Stampa richiesta password.
-	PUSH	NULL
-	PUSH	msginpas	! inserire pass
-	PUSH	NULL
-	PUSH	NULL
-	PUSH	msgtitle	! CONTROLLO ACCESSI
-	PUSH	NULL
-	CALL	drwscr
-	ADD	SP, 12
+	! Richiesta password.
+	PUSH	password
+	PUSH	msgtitle
+	CALL	askpass
+	ADD	SP, 4
 
-	! Lettura password.
-	CALL	rdpass
-	CMP	AX, -1		! password errata
+	! Autenticazione.
+	PUSH	password
+	PUSH	(userid)
+	CALL	authusr
+	CMP	AX, -1
 	JE	1b
-
+	
 	! Gestione utente / amministratore.
 	MOV	AX, (userid)
 	CMP	AX, ROOTUID
@@ -80,8 +78,6 @@ logpath:
 	.ASCIZ	"porta.log"
 msgtitle:
 	.ASCIZ	"CONTROLLO ACCESSI"
-msginpas:
-	.ASCIZ	"digitare password..."
 
 .SECT .BSS
 logfd:

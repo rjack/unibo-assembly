@@ -2,7 +2,7 @@
 
 ASS=as88
 BOOT=boot
-SOURCES=adm.s drwscr.s file.s io.s kbrd.s menu.s rom.s string.s usr.s
+SOURCES=adm.s drwscr.s io.s kbrd.s menu.s rom.s string.s usr.s
 COMMON=defs.h Makefile
 
 

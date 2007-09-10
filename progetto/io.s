@@ -197,31 +197,6 @@ rdbadge:
 	POP	BP
 	RET
 
-! int rdpass (void)
-! Legge la password da tastierino numerico e la confronta con quella
-! letta dalla rom.
-! Ritorna 0 se la pass e' giusta, -1 altrimenti (stampando un messaggio
-! d'errore).
-rdpass:
-	PUSH	BP
-	MOV	BP, SP
-
-	PUSH	PASSLEN+1
-	PUSH	password
-	CALL	readkbd
-	PUSH	tmppass
-	CALL	memcmp
-	ADD	SP, 6
-	CMP	AX, 0
-	JE	9f
-
-	! FIXME
-	! Deve stampare l'errore errpass.
-
-9:	MOV	SP, BP
-	POP	BP
-	RET
-
 
 .SECT .DATA
 bdgpath:

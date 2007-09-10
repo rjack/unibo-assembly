@@ -153,7 +153,7 @@ askbadge:
 
 	! Stampa schermo iniziale.
 	PUSH	NULL
-	PUSH	insert		! "inserire il badge"
+	PUSH	msgbdg		! "inserire il badge"
 	PUSH	NULL
 	PUSH	NULL
 	PUSH	+4(BP)		! title
@@ -172,9 +172,41 @@ askbadge:
 	POP	BP
 	RET
 
+! void askpass (*title, *passbuf)
+! Stampa una schermata con titolo title richiedente la digitazione di una
+! password e ne attende l'inserimento. La password viene memorizzata, con
+! tanto di terminatore, nel buffer passbuf specificato, che deve essere lungo
+! almeno PASSLEN+1.
+askpass:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Stampa schermata
+	PUSH	NULL
+	PUSH	msgpass		! "digitare password"
+	PUSH	NULL
+	PUSH	NULL
+	PUSH	+4(BP)		! title
+	PUSH	NULL
+	CALL	drwscr
+	ADD	SP, 12
+
+	! Lettura password
+	PUSH	PASSLEN+1
+	PUSH	+6(BP)		! passbuf
+	CALL	readkbd
+	ADD	SP, 4
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
 .SECT .DATA
-insert:
+msgbdg:
 	.ASCIZ	"inserire il badge..."
+msgpass:
+	.ASCIZ	"digitare la password..."
 updwbrd:
 	.ASCIZ	"********************************\n"
 blkline:
