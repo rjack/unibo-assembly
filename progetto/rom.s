@@ -2,7 +2,53 @@
 !
 ! Giacomo Ritucci, Paolo Pennestri, 30/07/2007
 
+
 .SECT .TEXT
+
+! int srchrom (*name)
+! Cerca user tra i campi utente dei record della romimg.
+! Se user esiste ritorna il suo id, altrimenti ritorna -1.
+srchrom:
+	PUSH	BP
+	MOV	BP, SP
+
+	PUSH	BX
+	PUSH	CX
+
+	MOV	CX, (numusers)
+	! DEC	CX
+
+	! Costruzione offset al record.
+1:	PUSH	CX
+	CALL	getlnoff
+	ADD	SP, 2
+	SUB	AX, RECORDLEN
+	MOV	BX, AX	
+	ADD	BX, romimg
+
+	! Confronto stringa passata come argomento con nome utente del record.
+	PUSH	BX		! romimg + offset
+	PUSH	+4(BP)		! name
+	CALL	strcmp
+	ADD	SP, 4
+	CMP	AX, 0
+	LOOPNE	1b
+
+	! Controllo esito: se utente e' stato trovato ritorna id.
+	CMP	AX, 0
+	JE	2f
+	! Altrimenti ritorna -1.
+	MOV	AX, -1
+	JMP	9f
+
+2:	MOV	AX, CX		! CX = id utente
+
+9:	POP	CX
+	POP	BX
+
+	MOV	SP, BP
+	POP	BP
+	RET
 
 
 ! int getnumus (void)

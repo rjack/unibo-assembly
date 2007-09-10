@@ -87,8 +87,10 @@ msginpas:
 logfd:
 	.SPACE	2
 
-! Variabili usate nell'autenticazione dell'utente.
+! Variabili usate nell'identificazione dell'utente autenticato via badge.
 username:
 	.SPACE	MAXUSRLEN+1
 password:
 	.SPACE	PASSLEN+1
+userid:
+	.SPACE	2

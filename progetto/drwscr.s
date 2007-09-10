@@ -141,10 +141,10 @@ drwmsg:
 	POP	BP
 	RET
 
-! void askbadge (*title, *userbuf)
+! void askbadge (*title)
 ! Stampa una schermata con titolo title e con la richiesta di inserimento del
-! badge. Attende la pressione del tasto associato all'evento e usa rdbadge per
-! riempire il buffer userbuf, che deve essere grande almeno MAXUSRLEN.
+! badge. Attende la pressione del tasto associato all'evento e usa rdbadge
+! salvare il nome utente in username.
 ! In caso di errore ripresenta la domanda: non ritorna finche' il badge non
 ! e' stato letto correttamente.
 askbadge:

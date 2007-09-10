@@ -92,6 +92,7 @@ IN_2:
 	POP	BP
 	RET
 
+
 ! Apre la porta
 OUT_2:
 	PUSH	BP
@@ -148,8 +149,14 @@ rdbadge:
 	PUSH	BP
 	MOV	BP, SP
 
-	! Salvataggio registri usati
 	PUSH	DI
+
+	! Inizializzazione buffer username
+	PUSH	MAXUSRLEN+1
+	PUSH	0
+	PUSH	username
+	CALL	memset
+	ADD	SP, 6
 
 	MOV	DI, username
 
@@ -163,10 +170,8 @@ rdbadge:
 	JG	1b
 
 	! Ricerca utente nel database
-	! FIXME: da adattare al nuovo formato della rom.
 	PUSH	username
-	! FIXME 
-	! CALL	srchrom
+	CALL	srchrom
 	ADD	SP, 2
 	CMP	AX, -1
 	JE	8f
@@ -233,8 +238,6 @@ badgefd:
 	.WORD	-1
 
 .SECT .BSS
-userid:
-	.SPACE	2
 lettore:
 	.SPACE	1		! simula indirizzo mappato e buffer controller
 rele:
