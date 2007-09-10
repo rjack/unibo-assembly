@@ -83,7 +83,8 @@ usadd:
 
 	! Nome utente non deve essere gia' in uso.
 	PUSH	newusrn
-	CALL	srchrom
+	! FIXME
+	! CALL	srchrom
 	ADD	SP, 2
 	CMP	AX, -1
 	JNE	5f

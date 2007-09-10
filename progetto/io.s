@@ -165,7 +165,8 @@ rdbadge:
 	! Ricerca utente nel database
 	! FIXME: da adattare al nuovo formato della rom.
 	PUSH	username
-	CALL	srchrom
+	! FIXME 
+	! CALL	srchrom
 	ADD	SP, 2
 	CMP	AX, -1
 	JE	8f
