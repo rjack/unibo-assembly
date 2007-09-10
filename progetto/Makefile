@@ -1,7 +1,7 @@
 # Makefile per progetto assembly
 
 ASS=as88
-BOOT=aaboot
+BOOT=boot
 SOURCES=adm.s drwscr.s file.s io.s kbrd.s menu.s rom.s string.s usr.s
 COMMON=defs.h Makefile
 
