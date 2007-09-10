@@ -30,12 +30,8 @@ main:
 	JE	9f
 	MOV	(logfd), AX
 
-1:	! Inizializzazione buffer di tutto il sistema.
-	! Eseguita prima di ogni inserimento del badge.
-	CALL	initbufs
-	
 	! Richiesta badge.
-	PUSH	msgtitle
+1:	PUSH	msgtitle
 	CALL	askbadge
 	ADD	SP, 2
 
@@ -70,32 +66,6 @@ main:
 	SYS
 
 
-! void initbufs (void)
-! Inizializza i buffer del sistema.
-initbufs:
-	CALL	clruser		! riempe di spazi username
-	CALL	clrpass		! idem con password
-	RET
-
-
-clruser:
-	PUSH	MAXUSRLEN
-	PUSH	'\0'
-	PUSH	username
-	CALL	memset
-	ADD	SP, 6
-	RET
-
-
-clrpass:
-	PUSH	PASSLEN
-	PUSH	'\0'
-	PUSH	password
-	CALL	memset
-	ADD	SP, 6
-	RET
-
-
 ! Routine per testare le altre routine
 dotest:
 	PUSH	BP
@@ -118,8 +88,7 @@ logfd:
 	.SPACE	2
 
 ! Variabili usate nell'autenticazione dell'utente.
-! username ha il terminatore, password no perche' e' di lunghezza fissa.
 username:
-	.SPACE	MAXUSRLEN
+	.SPACE	MAXUSRLEN+1
 password:
-	.SPACE	PASSLEN
+	.SPACE	PASSLEN+1
