@@ -1,0 +1,6 @@
+ROM
+- modifica al formato della rom; ogni riga deve avere questo formato:
+
+			  utente...........00000000.
+
+dove '.' sta per '\0'.
