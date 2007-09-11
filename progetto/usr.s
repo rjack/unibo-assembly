@@ -53,13 +53,27 @@ chgpass:
 	CALL	askpass
 	ADD	SP, 2
 
-	! Modifica password.
+	! Controllo lunghezza password.
 	PUSH	newpass
+	CALL	strlen
+	ADD	SP, 2
+	CMP	AX, 8
+	JE	1f
+
+	! Se troppo corta, schermata di errore e uscita.
+	PUSH	psleninf
+	PUSH	errlen
+	CALL	showerr
+	ADD	SP, 2
+	JMP	9f
+
+	! Modifica password.
+1:	PUSH	newpass
 	PUSH	(userid)
 	CALL	editpass
 	ADD	SP, 4
 
-	MOV	SP, BP
+9:	MOV	SP, BP
 	POP	BP
 	RET
 
@@ -67,5 +81,3 @@ chgpass:
 .SECT .DATA
 msgnewps:
 	.ASCIZ	"MODIFICA PASSWORD"
-errlenps:
-	.ASCIZ	"lunghezza errata!"

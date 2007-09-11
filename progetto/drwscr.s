@@ -203,11 +203,70 @@ askpass:
 	RET
 
 
+! void askusrn (*title, *userbuf)
+! Stampa una schermata con titolo title richiedente la digitazione di un
+! nome utente e ne attende l'inserimento. Il nome utente viene memorizzato,
+! con tanto di terminatore, nel buffer userbuf specificato, che deve essere
+! lungo almeno MAXUSRLEN+1.
+askusrn:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Stampa schermata
+	PUSH	NULL
+	PUSH	msgusrn		! "digitare nome utente"
+	PUSH	NULL
+	PUSH	NULL
+	PUSH	+4(BP)		! title
+	PUSH	NULL
+	CALL	drwscr
+	ADD	SP, 12
+
+	! Lettura nome utente.
+	PUSH	MAXUSRLEN+1
+	PUSH	+6(BP)		! userbuf
+	CALL	readkbd
+	ADD	SP, 4
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
+! void showerr (*title, *msg)
+! Stampa una schermata con titolo e messaggio specificati, attendendo la
+! pressione di un tasto qualsiasi dall'utente.
+showerr:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Stampa schermata di errore
+	PUSH	NULL
+	PUSH	msgakey		! "premere un tasto"
+	PUSH	+6(BP)		! msg
+	PUSH	NULL
+	PUSH	+4(BP)		! title
+	PUSH	NULL
+	CALL	drwscr
+	ADD	SP, 12
+
+	CALL	skipln
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
 .SECT .DATA
 msgbdg:
 	.ASCIZ	"inserire il badge..."
+msgusrn:
+	.ASCIZ	"digitare nome utente..."
 msgpass:
 	.ASCIZ	"digitare la password..."
+msgakey:
+	.ASCIZ	"premere un tasto..."
+
 updwbrd:
 	.ASCIZ	"********************************\n"
 blkline:

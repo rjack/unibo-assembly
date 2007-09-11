@@ -42,112 +42,72 @@ usrmng:
 
 
 usadd:
-	! FIXME
-	! Questo codice va adattato al nuovo formato della rom.
-	! FIXME
-	! Questo codice deve usare le funzioni rduser e rdpass.
-	! FIXME
-	! Questo codice deve gestire
 	PUSH	BP
 	MOV	BP, SP
 
-	! FIXME
-	! Ricerca del primo id libero della rom.
-	! CALL	freeid
-	! CMP	AX, -1
-	! JE	8f
-	! MOV	(newkey), AX
+	! Controllo numero utenti.
+	CMP	(numusers), MAXUSERS
+	JL	1f
+	
+	PUSH	cantadd
+	PUSH	errfull
+	JMP	8f
 
-	! FIXME
-	! Sostituire con askuser
-	PUSH	NULL
-	PUSH	msginusr	! inserire nome utente
-	PUSH	NULL
-	PUSH	NULL
-	PUSH	msgnewus	! NUOVO UTENTE
-	PUSH	NULL
-	CALL	drwscr
-	ADD	SP, 12
-
-	! FIXME
-	! Sostituire con askuser
-	! Lettura nuovo nome utente
-1:	PUSH	MAXUSRLEN+1
-	PUSH	newusrn
-	CALL	readkbd
+	! Richiesta nuovo nome utente.
+1:	PUSH	newusrn
+	PUSH	msgnewus	! "AGGIUNTA UTENTE"
+	CALL	askusrn
 	ADD	SP, 4
-	CMP	AX, 1
-	JLE	6f
-	CMP	AX, MAXUSRLEN+1
-	JG	6f
+
+	! Controllo lunghezza nome utente.
+	PUSH	newusrn
+	CALL	strlen
+	ADD	SP, 2
+	CMP	AX, 0
+	JG	1f
+
+	PUSH	usleninf
+	PUSH	errlen
+	JMP	8f
 
 	! Nome utente non deve essere gia' in uso.
-	PUSH	newusrn
-	! FIXME
-	! CALL	srchrom
+1:	PUSH	newusrn
+	CALL	srchrom
 	ADD	SP, 2
 	CMP	AX, -1
-	JNE	5f
+	JE	2f
 
-	! FIXME
-	! Sostituire con askpass
-	PUSH	5
-	! PUSH	msginpas		! digitare password
-	CALL	drwmsg
+	PUSH	cantadd
+	PUSH	errused
+	JMP	8f
+
+	! Richiesta nuova password.
+2:	PUSH	newpass
+	PUSH	msgnewus
+	CALL	askpass
 	ADD	SP, 4
 
-	! FIXME
-	! Sostituire con askpass
-	! Lettura password
-2:	PUSH	PASSLEN+1
+	! Controllo lunghezza password.
 	PUSH	newpass
-	CALL	readkbd
-	ADD	SP, 4
-	CMP	AX, PASSLEN+1
-	JNE	7f
+	CALL	strlen
+	ADD	SP, 2
+	CMP	AX, PASSLEN
+	JE	3f
 
-	PUSH	newpass
+	PUSH	psleninf
+	PUSH	errlen
+	JMP	8f
+
+	! Inserimento nella rom.
+3:	PUSH	newpass
 	PUSH	newusrn
 	CALL	romusadd
 	ADD	SP, 4
 	JMP	9f
 
-	! Lunghezza username non valida, salta all'inizio.
-5:	PUSH	4
-	PUSH	errusexs		! nome utente in uso
-	CALL	drwmsg
+	! Stampa l'errore.
+8:	CALL	showerr
 	ADD	SP, 4
-	JMP	1b
-
-	! Lunghezza username non valida, salta all'inizio.
-6:	PUSH	4
-	PUSH	erruslen
-	CALL	drwmsg
-	ADD	SP, 4
-	JMP	1b
-
-	! Lunghezza password non valida, salta a lettura pass.
-7:	PUSH	4
-	PUSH	errpslen
-	CALL	drwmsg
-	ADD	SP, 4
-	JMP	2b
-
-	! Rom piena, impossibile aggiungere un altro utente.
-8:	PUSH	NULL
-	PUSH	anykey
-	PUSH	cantadd
-	PUSH	NULL
-	PUSH	errfull
-	PUSH	NULL
-	CALL	drwscr
-	ADD	SP, 12
-
-	! Attende e scarta input.
-	PUSH	_GETCHAR
-	SYS
-	ADD	SP, 2
-	CALL	skipln
 
 9:	MOV	SP, BP
 	POP	BP
@@ -186,7 +146,6 @@ uslst:
 
 mtumng:
 	.ASCIZ	"GESTIONE UTENTI"
-
 meusadd:
 	.ASCIZ	"1. Aggiunta utente          "
 meuslst:
@@ -211,19 +170,19 @@ lsroute:
 lsmenu:
 	.WORD	mecancl, meussrch, meusprv, meusnxt, mtlst
 
+msgnewus:
+	.ASCIZ	"AGGIUNTA UTENTE"
+
 errfull:
 	.ASCIZ	"ROM PIENA"
+errused:
+	.ASCIZ	"NOME UTENTE IN USO"
 cantadd:
-	.ASCIZ	"Operazione impossibile."
-anykey:
-	.ASCIZ	"Premere un tasto..."
-msgnewus:
-	.ASCIZ	"NUOVO UTENTE"
-msginusr:
-	.ASCIZ	"digitare nome utente..."
-erruslen:
-	.ASCIZ	"Lunghezza nome utente errata"
-errpslen:
-	.ASCIZ	"Lunghezza password errata"
-errusexs:
-	.ASCIZ	"Nome utente gia' in uso"
+	.ASCIZ	"Impossibile aggiungere utente."
+
+errlen:
+	.ASCIZ	"LUNGHEZZA ERRATA"
+usleninf:
+	.ASCIZ	"da 1 a 16 caratteri."
+psleninf:
+	.ASCIZ	"8 caratteri."
