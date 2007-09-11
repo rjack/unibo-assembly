@@ -1,6 +1,0 @@
-1. Prossimo (inserimento)
-2. Prossimo (alfabetico)
-3. Ricerca per nome
-4. Rimuovi
-0. Annulla
-

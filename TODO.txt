@@ -1,6 +1,7 @@
 ROM
 
-[ ] implementazione elenco, ricerca e cancellazione utenti.
+[ ] implementazione elenco e cancellazione utenti.
+[ ] aggiunta messaggi d'errore dove necessario.
 
 [X] fix funzioni della rom perche' funzionino con il nuovo formato.
 [X] modifica al formato della rom; ogni riga deve avere questo formato:
