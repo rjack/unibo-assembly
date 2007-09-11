@@ -1,9 +1,7 @@
 ROM
 
-[ ] fix funzioni della rom perche' funzionino con il nuovo formato.
+[X] fix funzioni della rom perche' funzionino con il nuovo formato.
 
 [X] modifica al formato della rom; ogni riga deve avere questo formato:
-
 			  utente...........00000000.
-
 dove '.' sta per '\0'.
