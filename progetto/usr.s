@@ -35,37 +35,26 @@ opendoor:
 
 ! void chgpass (void)
 ! Richiede una nuova password e la sostituisce in rom.txt al posto della
-! vecchia. Accetta esclusivamente password di 8 caratteri, diversamente stampa
-! un errore e la chiede nuovamente.
+! vecchia.
 chgpass:
 	PUSH	BP
 	MOV	BP, SP
 
-	PUSH	NULL
-	PUSH	msginnew
-	PUSH	NULL
-	PUSH	NULL
-	PUSH	msgnewps
-	PUSH	NULL
-	CALL	drwscr
-	ADD	SP, 12
-
+	! Inizializzazione buffer.
 	PUSH	PASSLEN+1
-	PUSH	tmppass
-1:	CALL	readkbd
-	CMP	AX, PASSLEN+1
-	JE	2f
+	PUSH	0
+	PUSH	newpass
+	CALL	memset
+	ADD	SP, 6
 
-	! Stampa errore e torna a leggere la nuova pass.
-	PUSH	4
-	PUSH	errlenps
-	CALL	drwmsg
-	ADD	SP, 4
-	JMP	1b
+	! Richiesta password.
+	PUSH	newpass
+	PUSH	msgnewps
+	CALL	askpass
+	ADD	SP, 2
 
-2:	ADD	SP, 4
-
-	PUSH	tmppass
+	! Modifica password.
+	PUSH	newpass
 	PUSH	(userid)
 	CALL	editpass
 	ADD	SP, 4
@@ -74,10 +63,9 @@ chgpass:
 	POP	BP
 	RET
 
+
 .SECT .DATA
 msgnewps:
 	.ASCIZ	"MODIFICA PASSWORD"
-msginnew:
-	.ASCIZ	"digitare nuova password..."
 errlenps:
 	.ASCIZ	"lunghezza errata!"

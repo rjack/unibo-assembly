@@ -227,12 +227,3 @@ errpslen:
 	.ASCIZ	"Lunghezza password errata"
 errusexs:
 	.ASCIZ	"Nome utente gia' in uso"
-
-
-.SECT .BSS
-newusrn:
-	.SPACE	MAXUSRLEN+1
-newpass:
-	.SPACE	PASSLEN+1
-newkey:
-	.SPACE	2

@@ -90,3 +90,7 @@ password:
 	.SPACE	PASSLEN+1
 userid:
 	.SPACE	2
+newusrn:
+	.SPACE	MAXUSRLEN+1
+newpass:
+	.SPACE	PASSLEN+1

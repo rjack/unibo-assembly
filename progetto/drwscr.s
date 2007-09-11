@@ -172,6 +172,7 @@ askbadge:
 	POP	BP
 	RET
 
+
 ! void askpass (*title, *passbuf)
 ! Stampa una schermata con titolo title richiedente la digitazione di una
 ! password e ne attende l'inserimento. La password viene memorizzata, con
