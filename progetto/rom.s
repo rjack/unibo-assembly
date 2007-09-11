@@ -387,6 +387,77 @@ editpass:
 	RET
 
 
+! void inititer (void)
+! Inizializza le strutture dati che tengono traccia dell'iterazione sui
+! record. Da eseguire prima di ogni nuova iterazione.
+inititer:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Azzera id.
+	MOV	(iterid), 0
+
+	! Azzera il buffer.
+	PUSH	MAXUSRLEN+1
+	PUSH	0
+	PUSH	itrusrn
+	CALL	memset
+	ADD	SP, 6
+
+	! Uno spazio come primo carattere e' utile all'inizio dell'iterazione
+	! in ordine alfabetico.
+	MOVB	(itrusrn), ' '
+
+	! Idem per itralnxt.
+	PUSH	itrusrn
+	PUSH	itralnxt
+	CALL	strcpy
+	ADD	SP, 4
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
+! int romnext (int mode)
+! Passa al nome utente successivo nell'iterazione sui record. Il nome utente
+! viene memorizzato nel buffer itrusrn, il suo id in iterid. Se l'iterazione
+! e' giunta all'ultimo utente, la funzione ritorna al primo.
+! L'argomento mode specifica se avanzare in ordine di inserimento (0) oppure
+! alfaberico (1).
+! Ritorna l'id utente.
+! SIDE EFFECT:
+! - modifica iterid, itrusrn e itralnxt
+romnext:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Passa al prossimo id: iterid = (iterid + 1) % numusers
+	INC	(iterid)
+	MOV	AX, (iterid)
+	CMP	AX, (numusers)
+	JL	1f
+	
+	! Se l'iterazione era arrivata alla fine, riparte da 1.
+	MOV	(iterid), 1
+
+	! Costruzione puntatore al nome utente.
+1:	PUSH	(iterid)
+	CALL	getlnoff
+	ADD	SP, 2
+	ADD	AX, romimg
+
+	! Copia in itrusrn.
+	PUSH	AX
+	PUSH	itrusrn
+	CALL	strcpy
+	ADD	SP, 4
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
 .SECT .DATA
 rompath:
 	.ASCIZ	"./rom.txt"
@@ -399,8 +470,10 @@ romimg:
 numusers:
 	.SPACE	2
 
-! Buffer temporanei per utente e password.
-tmpusrn:
+! Buffer per tenere traccia dell'iterazione sui record della rom.
+iterid:
+	.SPACE	2
+itrusrn:
         .SPACE  MAXUSRLEN+1
-tmppass:
-        .SPACE  PASSLEN+1
+itralnxt:
+        .SPACE  MAXUSRLEN+1

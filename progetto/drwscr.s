@@ -22,7 +22,6 @@ drwscr:
 	PUSH	SI
 
 	! Scorrimento in alto delle schermate vecchie.
-	! FIXME rimetterlo prima della consegna
 	PUSH	flush
 	PUSH	_PRINTF
 	SYS

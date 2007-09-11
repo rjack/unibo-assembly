@@ -27,16 +27,18 @@ shwmenu:
 	DEC	CX		! titolo
 
 	! Argomenti di drwscr per le righe vuote.
+	CMP	CX, 0
+	JE	2f
 1:	PUSH	NULL
 	LOOP	1b
 
 	! Argomenti di drwscr per le voci del menu e il titolo
-	MOV	CX, +8(BP)	! n
+2:	MOV	CX, +8(BP)	! n
 	INC	CX
 	MOV	SI, +6(BP)	! menuarray
-1:	LODS
+2:	LODS
 	PUSH	AX
-	LOOP	1b
+	LOOP	2b
 
 	CALL	drwscr
 	ADD	SP, 12
@@ -59,6 +61,7 @@ shwmenu:
 	MOV	SP, BP
 	POP	BP
 	RET
+
 
 ! void noop (void)
 ! Non fa nulla. Associata alle voci "0. Annulla" dei menu.

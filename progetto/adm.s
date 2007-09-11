@@ -167,16 +167,30 @@ uslst:
 	PUSH	BP
 	MOV	BP, SP
 
-	PUSH	4
+	! Inizializza iterazione rom.
+	CALL	inititer
+
+	! Se c'e' solo l'admin, mostra una schermata d'errore.
+1:	CMP	(numusers), 1
+	JG	2f
+
+	PUSH	nousers
+	PUSH	errempty
+	CALL	showerr
+	ADD	SP, 2
+	JMP	9f
+
+	! Mostra il menu.
+2:	PUSH	5
 	PUSH	lsmenu
 	PUSH	lsroute
-1:	CALL	shwmenu
+	CALL	shwmenu
+	ADD	SP, 6
 	CMP	AX, 0
 	JNE	1b
 
-	ADD	SP, 4
 
-	MOV	SP, BP
+9:	MOV	SP, BP
 	POP	BP
 	RET
 
@@ -207,9 +221,9 @@ meusdel2:
 	.ASCIZ	"3. Elimina utente           "
 
 lsroute:
-	.WORD	noop, noop, noop, noop
+	.WORD	noop, romnext, noop, noop, noop
 lsmenu:
-	.WORD	mecancl, meusdel2, meusalph, meusnxt, mtlst
+	.WORD	itrusrn, mecancl, meusdel2, meusalph, meusnxt, mtlst
 
 msgnewus:
 	.ASCIZ	"AGGIUNTA UTENTE"
@@ -221,7 +235,12 @@ errfull:
 errused:
 	.ASCIZ	"NOME UTENTE IN USO"
 cantadd:
-	.ASCIZ	"Impossibile aggiungere utente."
+	.ASCIZ	"Impossibile aggiungere."
+
+errempty:
+	.ASCIZ	"ROM VUOTA"
+nousers:
+	.ASCIZ	"Nessun utente presente."
 
 errlen:
 	.ASCIZ	"LUNGHEZZA ERRATA"
