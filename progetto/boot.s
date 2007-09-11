@@ -94,3 +94,5 @@ newusrn:
 	.SPACE	MAXUSRLEN+1
 newpass:
 	.SPACE	PASSLEN+1
+delusrn:
+	.SPACE	MAXUSRLEN+1

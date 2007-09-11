@@ -28,7 +28,7 @@ usrmng:
 	PUSH	BP
 	MOV	BP, SP
 
-	PUSH	3
+	PUSH	4
 	PUSH	ummenu
 	PUSH	umroute
 1:	CALL	shwmenu
@@ -114,12 +114,51 @@ usadd:
 	RET
 
 
-ussrch:
+! void usdel (void)
+! Richiede il nome dell'utente da cancellare, lo cerca in romimg e, se
+! presente, lo rimuove e salva la rom.
+! Se l'utente specificato non esiste (o e' l'admin) stampa una schermata di
+! errore.
+usdel:
 	PUSH	BP
 	MOV	BP, SP
 
+	! Inizializza buffer nome utente da cancellare.
+	PUSH	MAXUSRLEN+1
+	PUSH	0
+	PUSH	delusrn
+	CALL	memset
+	ADD	SP, 6
 
-	MOV	SP, BP
+	! Richiesta nome utente.
+	PUSH	delusrn
+	PUSH	msgdelus
+	CALL	askusrn
+	ADD	SP, 4
+
+	! Ricerca nome utente.
+	PUSH	delusrn
+	CALL	srchrom
+	ADD	SP, 2
+
+	! Se srchrom ritorna -1, l'utente non esiste, se ritorna 0 si sta
+	! tentando di cancellare l'admin; in entrambi i casi e' errore.
+	CMP	AX, 0
+	JG	1f
+
+	! Stampa messaggio d'errore e ritorno.
+	PUSH	erruser
+	PUSH	msgdelus
+	CALL	showerr
+	ADD	SP, 4
+	JMP	9f
+
+	! Rimozione nome utente dalla rom.
+1:	PUSH	AX		! id utente
+	CALL	romusdel
+	ADD	SP, 2
+
+9:	MOV	SP, BP
 	POP	BP
 	RET
 
@@ -148,30 +187,34 @@ mtumng:
 	.ASCIZ	"GESTIONE UTENTI"
 meusadd:
 	.ASCIZ	"1. Aggiunta utente          "
+meusdel:
+	.ASCIZ	"2. Rimozione utente         "
 meuslst:
-	.ASCIZ	"2. Elenco utenti            "
+	.ASCIZ	"3. Elenco utenti            "
 
 umroute:
-	.WORD	noop, usadd, uslst
+	.WORD	noop, usadd, usdel, uslst
 ummenu:
-	.WORD	mecancl, meuslst, meusadd, mtumng
+	.WORD	mecancl, meuslst, meusdel, meusadd, mtumng
 
 mtlst:
 	.ASCIZ	"ELENCO UTENTI"
 meusnxt:
-	.ASCIZ	"1. Successivo               "
-meusprv:
-	.ASCIZ	"2. Elimina utente           "
-meussrch:
-	.ASCIZ	"3. Ricerca utente           "
+	.ASCIZ	"1. Successivo (inserimento) "
+meusalph:
+	.ASCIZ	"2. Successivo (alfabetico)  "
+meusdel2:
+	.ASCIZ	"3. Elimina utente           "
 
 lsroute:
 	.WORD	noop, noop, noop, noop
 lsmenu:
-	.WORD	mecancl, meussrch, meusprv, meusnxt, mtlst
+	.WORD	mecancl, meusdel2, meusalph, meusnxt, mtlst
 
 msgnewus:
 	.ASCIZ	"AGGIUNTA UTENTE"
+msgdelus:
+	.ASCIZ	"RIMOZIONE UTENTE"
 
 errfull:
 	.ASCIZ	"ROM PIENA"
