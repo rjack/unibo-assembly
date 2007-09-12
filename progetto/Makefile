@@ -6,10 +6,10 @@ SOURCES=adm.s drwscr.s io.s kbrd.s menu.s rom.s string.s usr.s
 COMMON=defs.h Makefile
 
 
-.PHONY	: all clean
+.PHONY	: boot tags clean
 
 
-all	: tags $(BOOT).s $(SOURCES) $(COMMON)
+boot	: $(BOOT).s $(SOURCES) $(COMMON)
 	$(ASS) $(BOOT).s $(SOURCES)
 
 
