@@ -336,6 +336,9 @@ romusdel:
 	CMP	AX, 0
 	JE	8f
 
+	! Costruzione puntatore alla riga.
+	ADD	BX, romimg
+
 	! Copia delle righe successive alla numero id sulla numero id.
 	! Le aree di memoria si sovrappongono ma la copia e' possibile perche'
 	! avviene dagli indirizzi piu' alti a quelli piu' bassi.
