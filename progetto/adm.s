@@ -28,7 +28,7 @@ usrmng:
 	PUSH	BP
 	MOV	BP, SP
 
-	PUSH	4
+	PUSH	5
 	PUSH	ummenu
 	PUSH	umroute
 1:	CALL	shwmenu
@@ -162,13 +162,43 @@ usdel:
 	POP	BP
 	RET
 
-
 uslst:
 	PUSH	BP
 	MOV	BP, SP
 
 	! Inizializza iterazione rom.
+	PUSH	0
 	CALL	inititer
+	ADD	SP, 2
+
+	CALL	dolst
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
+uslstal:
+	PUSH	BP
+	MOV	BP, SP
+
+	! Inizializza iterazione alfabetica rom.
+	PUSH	1
+	CALL	inititer
+	ADD	SP, 2
+	
+	CALL	dolst
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
+dolst:
+	PUSH	BP
+	MOV	BP, SP
+
+	PUSH	BX
 
 	! Se c'e' solo l'admin, mostra una schermata d'errore.
 1:	CMP	(numusers), 1
@@ -177,20 +207,41 @@ uslst:
 	PUSH	nousers
 	PUSH	errempty
 	CALL	showerr
-	ADD	SP, 2
+	ADD	SP, 4
 	JMP	9f
 
 	! Mostra il menu.
-2:	PUSH	5
+2:	PUSH	4
 	PUSH	lsmenu
 	PUSH	lsroute
 	CALL	shwmenu
 	ADD	SP, 6
+
+	! Utente ha scelto "annulla", esce dal menu.
 	CMP	AX, 0
+	JE	9f
+
+	! Se non ha scelto "elimina" torna subito a mostrare il menu.
+	CMP	AX, 2
 	JNE	1b
 
+	! Altrimenti cancellazione utente e visualizzazione successivo.
+	MOV	BX, (iterid)	! salva in BX l'id da cancellare
+	CALL	romnext
+	! Ora iterid contiene il nuovo id.
+	! Se cancelliamo un id utente minore di quello che dobbiamo mostrare,
+	! va decrementato l'id superstite.
+	CMP	BX, (iterid)
+	JGE	3f
+	DEC	(iterid)
+3:	PUSH	BX
+	CALL	romusdel
+	ADD	SP, 2
+	JMP	1b
 
-9:	MOV	SP, BP
+9:	POP	BX
+
+	MOV	SP, BP
 	POP	BP
 	RET
 
@@ -200,30 +251,30 @@ uslst:
 mtumng:
 	.ASCIZ	"GESTIONE UTENTI"
 meusadd:
-	.ASCIZ	"1. Aggiunta utente          "
+	.ASCIZ	"1. Aggiunta                 "
 meusdel:
-	.ASCIZ	"2. Rimozione utente         "
+	.ASCIZ	"2. Rimozione                "
 meuslst:
-	.ASCIZ	"3. Elenco utenti            "
+	.ASCIZ	"3. Elenco                   "
+meuslsal:
+	.ASCIZ	"4. Elenco alfabetico        "
 
 umroute:
-	.WORD	noop, usadd, usdel, uslst
+	.WORD	noop, usadd, usdel, uslst, uslstal
 ummenu:
-	.WORD	mecancl, meuslst, meusdel, meusadd, mtumng
+	.WORD	mecancl, meuslsal, meuslst, meusdel, meusadd, mtumng
 
 mtlst:
 	.ASCIZ	"ELENCO UTENTI"
 meusnxt:
-	.ASCIZ	"1. Successivo (inserimento) "
-meusalph:
-	.ASCIZ	"2. Successivo (alfabetico)  "
+	.ASCIZ	"1. Successivo               "
 meusdel2:
-	.ASCIZ	"3. Elimina utente           "
+	.ASCIZ	"2. Elimina utente           "
 
 lsroute:
-	.WORD	noop, romnext, noop, noop, noop
+	.WORD	noop, romnext, noop, noop
 lsmenu:
-	.WORD	itrusrn, mecancl, meusdel2, meusalph, meusnxt, mtlst
+	.WORD	itrusrn, mecancl, meusdel2, meusnxt, mtlst
 
 msgnewus:
 	.ASCIZ	"AGGIUNTA UTENTE"

@@ -390,12 +390,18 @@ editpass:
 	RET
 
 
-! void inititer (void)
+! void inititer (int mode)
 ! Inizializza le strutture dati che tengono traccia dell'iterazione sui
 ! record. Da eseguire prima di ogni nuova iterazione.
+! L'argomento mode imposta il tipo di iterazione: 0 = inserimento, 1 = 
+! alfabetico.
 inititer:
 	PUSH	BP
 	MOV	BP, SP
+
+	! Imposta modalita'.
+	MOV	AX, +4(BP)
+	MOV	(itmode), AX
 
 	! Azzera id.
 	MOV	(iterid), 0
@@ -422,30 +428,37 @@ inititer:
 	RET
 
 
-! int romnext (int mode)
-! Passa al nome utente successivo nell'iterazione sui record. Il nome utente
-! viene memorizzato nel buffer itrusrn, il suo id in iterid. Se l'iterazione
-! e' giunta all'ultimo utente, la funzione ritorna al primo.
-! L'argomento mode specifica se avanzare in ordine di inserimento (0) oppure
-! alfaberico (1).
-! Ritorna l'id utente.
+! void romnext (void)
+! Passa al nome utente successivo (secondo la modalita' specificata da
+! inititer) nell'iterazione sui record. Il nome utente viene memorizzato nel
+! buffer itrusrn, il suo id in iterid. Se l'iterazione e' giunta all'ultimo
+! utente, la funzione ritorna al primo.
 ! SIDE EFFECT:
-! - modifica iterid, itrusrn e itralnxt
+! - modifica iterid e itrusrn; se iterazione alfabetica anche itralnxt.
 romnext:
 	PUSH	BP
 	MOV	BP, SP
 
-	! Passa al prossimo id: iterid = (iterid + 1) % numusers
+	! Controllo modalita' interazione.
+	CMP	(itmode), 0
+	JNE	1f
+
+	! Ordine di inserimento:
+	! passa al prossimo id: iterid = (iterid + 1) % numusers
 	INC	(iterid)
 	MOV	AX, (iterid)
 	CMP	AX, (numusers)
-	JL	1f
+	JL	2f
 	
 	! Se l'iterazione era arrivata alla fine, riparte da 1.
 	MOV	(iterid), 1
+	JMP	2f
+
+	! Ordine alfabetico 
+1:	CALL	nxtalpha
 
 	! Costruzione puntatore al nome utente.
-1:	PUSH	(iterid)
+2:	PUSH	(iterid)
 	CALL	getlnoff
 	ADD	SP, 2
 	ADD	AX, romimg
@@ -455,6 +468,18 @@ romnext:
 	PUSH	itrusrn
 	CALL	strcpy
 	ADD	SP, 4
+
+	MOV	SP, BP
+	POP	BP
+	RET
+
+
+! int nxtalpha (void)
+nxtalpha:
+	PUSH	BP
+	MOV	BP, SP
+
+	! TODO
 
 	MOV	SP, BP
 	POP	BP
@@ -480,3 +505,5 @@ itrusrn:
         .SPACE  MAXUSRLEN+1
 itralnxt:
         .SPACE  MAXUSRLEN+1
+itmode:
+	.SPACE	2
