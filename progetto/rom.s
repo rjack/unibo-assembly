@@ -417,12 +417,6 @@ inititer:
 	! in ordine alfabetico.
 	MOVB	(itrusrn), ' '
 
-	! Idem per itralnxt.
-	PUSH	itrusrn
-	PUSH	itralnxt
-	CALL	strcpy
-	ADD	SP, 4
-
 	MOV	SP, BP
 	POP	BP
 	RET
@@ -433,8 +427,6 @@ inititer:
 ! inititer) nell'iterazione sui record. Il nome utente viene memorizzato nel
 ! buffer itrusrn, il suo id in iterid. Se l'iterazione e' giunta all'ultimo
 ! utente, la funzione ritorna al primo.
-! SIDE EFFECT:
-! - modifica iterid e itrusrn; se iterazione alfabetica anche itralnxt.
 romnext:
 	PUSH	BP
 	MOV	BP, SP
@@ -474,16 +466,93 @@ romnext:
 	RET
 
 
-! int nxtalpha (void)
+! void nxtalpha (void)
 nxtalpha:
 	PUSH	BP
 	MOV	BP, SP
 
-	! TODO
+1:	PUSH	itrusrn	! -2(BP) = ptr username
+	PUSH	0	! -4(BP) = ptr record candidato
+	PUSH	0	! -6(BP) = ptr record corrente
+
+	! Inizializzazione ptr record corrente.
+	CALL	getromsz
+	ADD	AX, romimg
+	SUB	AX, RECORDLEN
+	MOV	-6(BP), AX
+
+	! Se non e' ancora stato trovato un candidato...
+ciclo:	CMP	-4(BP), 0
+	JNE	match
+
+	! ... si cerca il primo utente > iterid.
+	PUSH	-6(BP)		! corrente
+	PUSH	-2(BP)		! username
+	CALL	strcmp
+	ADD	SP, 4
+	CMP	AX, 0
+	JGE	avan
+
+	! Trovato: candidato = corrente.
+	MOV	AX, -6(BP)
+	MOV	-4(BP), AX
+
+	JMP	avan
+
+	! ... altrimenti si confronta il candidato con i rimanenti utenti: un
+	! utente diventa il candidato se viene prima del candidato corrente e
+	! dopo l'iterid.
+match:	PUSH	-4(BP)		! candidato
+	PUSH	-6(BP)		! corrente
+	CALL	strcmp
+	ADD	SP, 4
+	CMP	AX, 0
+	JGE	avan
+
+	! corrente < candidato, bisogna controllare se e' anche > iterid
+	PUSH	-6(BP)		! corrente
+	PUSH	-2(BP)		! username
+	CALL	strcmp
+	ADD	SP, 4
+	CMP	AX, 0
+	JGE	avan
+
+	! corrente e' il nuovo candidato
+	MOV	AX, -6(BP)
+	MOV	-4(BP), AX
+
+	! Avanti il prossimo!
+avan:	MOV	AX, -6(BP)
+	SUB	AX, RECORDLEN
+	MOV	-6(BP), AX
+
+	CMP	AX, romimg
+	JG	ciclo
+
+	! -4(BP) e' il puntatore al prossimo utente da visualizzare; se e'
+	! rimasto 0, siamo arrivati all'ultimo utente della lista e
+	! ricominciamo dal primo.
+	MOV	AX, -4(BP)
+	CMP	AX, 0
+	JNE	9f
+
+	! Reinizializza dati e salta all'inizio di questa procedura.
+	PUSH	1
+	CALL	inititer
+	MOV	SP, BP		! pulizia stack
+	JMP	1b
+
+	! Altrimenti calcola l'id utente a partire dal puntatore.
+9:	SUB	AX, romimg
+	PUSH	RECORDLEN
+	DIV	-8(BP)
+
+	MOV	(iterid), AX	! salvataggio id
 
 	MOV	SP, BP
 	POP	BP
 	RET
+
 
 
 .SECT .DATA
@@ -501,9 +570,11 @@ numusers:
 ! Buffer per tenere traccia dell'iterazione sui record della rom.
 iterid:
 	.SPACE	2
+itprop:
+	.SPACE	2
+itnext:
+	.SPACE	2
 itrusrn:
-        .SPACE  MAXUSRLEN+1
-itralnxt:
         .SPACE  MAXUSRLEN+1
 itmode:
 	.SPACE	2

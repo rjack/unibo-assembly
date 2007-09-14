@@ -211,7 +211,12 @@ dolst:
 	JMP	9f
 
 	! Mostra il menu.
-2:	PUSH	4
+2:	CMP	(iterid), 0
+	JNE	3f
+
+	CALL	romnext
+
+3:	PUSH	4
 	PUSH	lsmenu
 	PUSH	lsroute
 	CALL	shwmenu
@@ -232,9 +237,9 @@ dolst:
 	! Se cancelliamo un id utente minore di quello che dobbiamo mostrare,
 	! va decrementato l'id superstite.
 	CMP	BX, (iterid)
-	JGE	3f
+	JGE	4f
 	DEC	(iterid)
-3:	PUSH	BX
+4:	PUSH	BX
 	CALL	romusdel
 	ADD	SP, 2
 	JMP	1b
