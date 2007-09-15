@@ -140,7 +140,8 @@ OUT_2:
 
 ! int rdbadge (void)
 ! Accede al lettore del badge, attende l'inserimento e prova a leggere il nome
-! utente, salvandolo nella variabile username.
+! utente, salvandolo nella variabile username e cercando il record
+! corrispettivo nella rom.
 ! Ritorna 0 se tutto ok, -1 se fallisce. In questo caso mostra un messaggio di
 ! errore.
 ! SIDE EFFECT:
@@ -174,10 +175,13 @@ rdbadge:
 	CALL	srchrom
 	ADD	SP, 2
 	CMP	AX, -1
-	JE	8f
+	JNE	7f
+
+	MOV	DX, erruser
+	JMP	8f
 
 	! L'utente esiste, salva userid e ritorna zero.
-	MOV	(userid), AX
+7:	MOV	(userid), AX
 	MOV	AX, 0
 	JMP	9f
 
