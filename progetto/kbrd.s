@@ -222,9 +222,6 @@ kbdstr:
 	.ASCII	"8tuv8tuv8tuv8tuv8tuv"
 	.ASCII	"9wxyz9wxyz9wxyz9wxyz"
 
-numfmt:
-	.ASCIZ	"%d"
-
 errchc:
 	.ASCIZ	"Scelta non valida!"
 

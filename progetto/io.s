@@ -23,7 +23,7 @@ IN_2:
 	MOV	DX, errhw	! init msg errore
 
 	! Controllo indirizzo passato come argomento.
-	MOV	BX, lettore
+	MOV	BX, 0x0
 	CMP	BX, +4(BP)
 	JNE	9f
 
@@ -101,7 +101,7 @@ OUT_2:
 	PUSH	DI		! salvataggio
 
 	! Confronto indirizzo dato.
-	CMP	+4(BP), rele
+	CMP	+4(BP), 0x3
 	JNE	8f
 
 	SUB	SP, 2		! spazio per lunghezza username
@@ -160,7 +160,7 @@ rdbadge:
 
 	MOV	DI, username
 
-1:	PUSH	lettore
+1:	PUSH	0x0
 	CALL	IN_2
 	ADD	SP, 2
 	CMPB	AL, 0
@@ -207,13 +207,9 @@ erruser:
 	.ASCIZ	"Utente inesistente"
 errhw:
 	.ASCIZ	"Malfunzionamento lettore"
-errpass:
-	.ASCIZ	"Password errata"
 badgefd:
 	.WORD	-1
 
 .SECT .BSS
 lettore:
-	.SPACE	1		! simula indirizzo mappato e buffer controller
-rele:
-	.SPACE	1		! simula indirizzo mappato
+	.SPACE	1		! buffer carattere letto dal badge

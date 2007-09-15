@@ -5,6 +5,8 @@
 .SECT .TEXT
 ! void serveadm (void)
 ! Presenta il menu amministratore sul display.
+! Ritorna quando la scelta e' "Annulla" oppure "Apri porta", altrimenti
+! continua a ciclare.
 serveadm:
 	PUSH	BP
 	MOV	BP, SP
@@ -13,17 +15,17 @@ serveadm:
 	PUSH	admmenu
 	PUSH	admroute
 1:	CALL	shwmenu
-	CMP	AX, 2		! modifica pass
-	JE	1b
-	CMP	AX, 3		! gestione utenti
-	JE	1b
+	CMP	AX, 2
+	JGE	1b
 	ADD	SP, 6
 
 	MOV	SP, BP
 	POP	BP
 	RET
 
-
+! void usrmng (void)
+! Presenta il menu per la gestione degli utenti.
+! Ritorna quando la scelta e' "Annulla", altrimenti cicla.
 usrmng:
 	PUSH	BP
 	MOV	BP, SP
@@ -41,6 +43,9 @@ usrmng:
 	RET
 
 
+! void usadd (void)
+! Aggiunta interattiva di un utente.
+! Richiede nome utente e pass da tastiera e li aggiunge alla rom.
 usadd:
 	PUSH	BP
 	MOV	BP, SP
@@ -162,6 +167,8 @@ usdel:
 	POP	BP
 	RET
 
+! void uslst (void)
+! Wrapper per dolst. Inizializza l'iterazione in ordine di inserimento.
 uslst:
 	PUSH	BP
 	MOV	BP, SP
@@ -178,6 +185,8 @@ uslst:
 	RET
 
 
+! void uslstal (void)
+! Wrapper per dolst. Inizializza l'iterazione in ordine alfabetico.
 uslstal:
 	PUSH	BP
 	MOV	BP, SP
@@ -194,6 +203,9 @@ uslstal:
 	RET
 
 
+! void dolst (void)
+! Mostra il menu per l'iterazione sulla rom e per la cancellazione dell'utente
+! correntemente visualizzato.
 dolst:
 	PUSH	BP
 	MOV	BP, SP
@@ -210,19 +222,20 @@ dolst:
 	ADD	SP, 4
 	JMP	9f
 
-	! Mostra il menu.
+	! Se iterid e' 0 bisogna dare l'avvio all'iterazione chiamando
+	! subito romnext, altrimenti si salta direttamente al menu.
 2:	CMP	(iterid), 0
 	JNE	3f
-
 	CALL	romnext
 
+	! Mostra il menu.
 3:	PUSH	4
 	PUSH	lsmenu
 	PUSH	lsroute
 	CALL	shwmenu
 	ADD	SP, 6
 
-	! Utente ha scelto "annulla", esce dal menu.
+	! Scelto "annulla", esce dal menu.
 	CMP	AX, 0
 	JE	9f
 

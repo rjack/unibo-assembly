@@ -24,7 +24,7 @@ opendoor:
 	PUSH	BP
 	MOV	BP, SP
 
-	PUSH	rele
+	PUSH	0x3
 	CALL	OUT_2
 	ADD	SP, 2
 

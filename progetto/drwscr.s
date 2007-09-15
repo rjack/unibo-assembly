@@ -1,8 +1,5 @@
 ! drwscr.s - routine per la stampa dello schermo
 !
-! procedure:
-! 	drwscr, disegna il display e il tastierino
-!
 ! Giacomo Ritucci, Paolo Pennestri, 28/07/2007
 
 	LINELEN = 29		! 28 spazi piu' terminatore
@@ -96,8 +93,7 @@ drwscr:
 	SYS
 	ADD	SP, 4
 
-	! FIXME commentata perche' il tracer ha il display piccolo
-	! Stampa del tastierino
+	! Stampa del tastierino.
 	PUSH	keybrd
 	PUSH	_PRINTF
 	SYS

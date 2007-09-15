@@ -1,10 +1,5 @@
 ! string.s - operazioni su stringhe
 !
-! procedure:
-! 	memcpy, copia n byte
-! 	strlen, calcola lunghezza stringa
-! 	strcpy, copia stringa
-!
 ! Giacomo Ritucci, Paolo Pennestri, 28/07/2007
 
 

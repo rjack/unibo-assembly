@@ -31,6 +31,10 @@ authusr:
 	CMP	AX, 0
 	JE	9f
 	! Altrimenti ritorna -1.
+	PUSH	errpass
+	PUSH	noaccess
+	CALL	showerr
+	ADD	SP, 4
 	MOV	AX, -1
 
 9:	MOV	SP, BP
@@ -130,7 +134,6 @@ getlnoff:
 
 ! int openrom (void)
 ! Apre il file che simula la rom.
-! Ritorna -1 se fallisce, 0 se tutto ok.
 ! SIDE EFFECT:
 ! - salva in romfd il valore del file descriptor del file della rom.
 openrom:
@@ -138,18 +141,24 @@ openrom:
 	MOV	BP, SP
 
 	! Apertura del file rom.txt in lettura e scrittura.
-	PUSH	RDWR
+1:	PUSH	RDWR
 	PUSH	rompath
 	PUSH	_OPEN
 	SYS
 	ADD	SP, 6
 
-	! Se open fallisce ritorna -1.
+	! Se open fallisce mostra errore e riprova.
 	CMP	AX, -1
-	JE	9f
+	JNE	8f
+
+	PUSH	callhelp
+	PUSH	romerr
+	CALL	showerr
+	ADD	SP, 4
+	JMP	1b
 
 	! Altrimenti, salva il file descriptor e ritorna 0.
-	MOV	(romfd), AX
+8:	MOV	(romfd), AX
 	MOV	AX, 0
 	
 9:	MOV	SP, BP
@@ -179,10 +188,11 @@ getromsz:
 
 ! int loadrom (void)
 ! Legge tutta la rom e ne salva l'immagine in memoria. Calcola il numero di
-! utenti presenti contando le righe del file.
+! utenti presenti contando i record del file.
 ! Ritorna 0 se riesce, -1 se fallisce.
 ! SIDE EFFECT:
 ! - salva in numusers il numero di righe lette.
+! - se fallisce chiude il file della rom.
 loadrom:
 	PUSH	BP
 	MOV	BP, SP
@@ -195,12 +205,28 @@ loadrom:
 	SYS
 	ADD	SP, 8
 
-	! Se _READ ritorna errore, salta alla fine.
+	! Se _READ ritorna errore, chiude il file della rom e mostra un
+	! messaggio d'errore.
 	CMP	AX, -1
-	JE	9f
+	JNE	8f
+
+	PUSH	(romfd)
+	CALL	_CLOSE
+	SYS
+	ADD	SP, 2
+	MOV	(romfd), -1
+
+	PUSH	callhelp
+	PUSH	romrderr
+	CALL	showerr
+	ADD	SP, 4
+
+	! Ritorna -1
+	MOV	AX, -1
+	JMP	9f
 
 	! Calcolo e salvataggio del numero di utenti.
-	CALL	getnumus
+8:	CALL	getnumus
 	MOV	(numusers), AX
 	MOV	AX, 0
 
@@ -292,7 +318,6 @@ romusadd:
 
 	! Puntatore posizionato all'inizio del campo password e copia di
 	! newpass.
-	! TODO: usare strcpy al posto di memcpy?
 	ADD	BX, MAXUSRLEN+1
 	PUSH	PASSLEN
 	PUSH	+6(BP)
@@ -558,6 +583,18 @@ avan:	MOV	AX, -6(BP)
 .SECT .DATA
 rompath:
 	.ASCIZ	"./rom.txt"
+romerr:
+	.ASCIZ	"ERRORE ACCESSO ROM"
+romrderr:
+	.ASCIZ	"ERRORE LETTURA ROM"
+romwrerr:
+	.ASCIZ	"ERRORE SCRITTURA ROM"
+callhelp:
+	.ASCIZ	"Contattare assistenza."
+noaccess:
+	.ASCIZ	"ERRORE AUTENTICAZIONE"
+errpass:
+	.ASCIZ	"Password errata."
 
 .SECT .BSS
 romfd:

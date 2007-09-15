@@ -95,7 +95,3 @@ meusmng:
 	.ASCIZ	"3. Gestione utenti          "
 mecancl:
 	.ASCIZ	"0. Annulla                  "
-
-.SECT .BSS
-choiche:
-	.SPACE	2	! carattere + terminatore
